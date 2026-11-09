@@ -16,6 +16,8 @@ class GBI0(GBI1):
                 0xB2: self.execute_rdp_half_cont,  # Defined as executeModifyVertex for GBI1
                 0x04: self.execute_vertex,  # Override vertex
                 0xBE: self.execute_cull_dl,
+                0x16: self.execute_reserved,  # Gamma64 Fix: Maintain stride alignment
+                0x3F: self.execute_reserved,  # Gamma64 Fix: Maintain stride alignment
             }
         )
 
