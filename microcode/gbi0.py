@@ -19,6 +19,7 @@ class GBI0(GBI1):
                 0x15: self.execute_set_other_mode_l,   # Proper GBI0 Link: Low Word blend modes
                 0x16: self.execute_set_geometry_mode,   # Proper GBI0 Link: Ambient/lighting/culling flags
                 0x3F: self.execute_set_other_mode_h,   # Proper GBI0 Link: High Word render modes
+                0x1D: self.execute_move_word,           # Proper GBI0 Link: Word translation macros
             }
         )
 
