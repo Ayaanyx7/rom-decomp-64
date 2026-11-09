@@ -10,12 +10,6 @@ class GBI0(GBI1):
         # GBI0 overrides
         self.commands.update(
             {
-                0x0F: self.execute_rdp_half_cont,
-                0xB0: self.execute_unknown,  # Defined as executeBranchZ for GBI1
-                0xB1: self.execute_tri4,  # Defined as executeTri2 for GBI1
-                0xB2: self.execute_rdp_half_cont,  # Defined as executeModifyVertex for GBI1
-                0x04: self.execute_vertex,  # Override vertex
-                0xBE: self.execute_cull_dl,
                 0x05: self.execute_reserved,
                 0x07: self.execute_reserved,
                 0x0B: self.execute_pop_matrix,
