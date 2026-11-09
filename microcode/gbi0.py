@@ -16,10 +16,22 @@ class GBI0(GBI1):
                 0xB2: self.execute_rdp_half_cont,  # Defined as executeModifyVertex for GBI1
                 0x04: self.execute_vertex,  # Override vertex
                 0xBE: self.execute_cull_dl,
-                0x15: self.execute_set_other_mode_l,   # Proper GBI0 Link: Low Word blend modes
-                0x16: self.execute_set_geometry_mode,   # Proper GBI0 Link: Ambient/lighting/culling flags
-                0x3F: self.execute_set_other_mode_h,   # Proper GBI0 Link: High Word render modes
-                0x1D: self.execute_move_word,           # Proper GBI0 Link: Word translation macros
+                0x05: self.execute_reserved,
+                0x07: self.execute_reserved,
+                0x0B: self.execute_pop_matrix,
+                0x0F: self.execute_rdp_half_cont,
+                0xB0: self.execute_unknown,
+                0xB1: self.execute_tri4,
+                0xB2: self.execute_rdp_half_cont,
+                0x04: self.execute_vertex,
+                0xBE: self.execute_cull_dl,
+                0x15: self.execute_set_other_mode_l,
+                0x16: self.execute_set_geometry_mode,
+                0x17: self.execute_clear_geometry_mode,
+                0x18: self.execute_end_dl,
+                0x1D: self.execute_move_word,
+                0x1E: self.execute_move_mem,
+                0x3F: self.execute_set_other_mode_h,
             }
         )
 
