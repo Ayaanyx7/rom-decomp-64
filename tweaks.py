@@ -311,7 +311,7 @@ def build_star_position_tweaks():
 
     use_editor = ctx.db.meta.hack_type != "SM64 Rom Manager"
 
-        if ctx.db.meta.hack_type not in ("SM64 Rom Manager", "SM64 Editor"):
+    if ctx.db.meta.hack_type not in ("SM64 Rom Manager", "SM64 Editor"):
         return []
             
     tweaks = []
