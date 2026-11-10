@@ -3,6 +3,28 @@ from dataclasses import dataclass
 from utils import level_const_name_to_int, level_num_to_const_name
 from typing import Dict, List
 
+import math
+
+
+def _imm_ok(rom, addr, length, kind):
+    """True if addr is the immediate of a plausible MIPS I-type op."""
+    if length == 2:
+        if addr % 4 != 2:
+            return False
+        w = addr - 2
+    elif length == 1:
+        if addr % 4 != 3 or rom[addr - 1] != 0:
+            return False
+        w = addr - 3
+    else:
+        return False
+    if w < 0 or w + 4 > len(rom):
+        return False
+    op = rom[w] >> 2
+    rs = ((rom[w] & 3) << 3) | (rom[w + 1] >> 5)
+    if kind == "load":  # li reg, imm
+        return op in (0x09, 0x0D) and rs == 0
+    return op in (0x09, 0x0A, 0x0B, 0x0D)  # addiu/slti/sltiu/ori
 
 class TweakValue(int):
     def __new__(cls, value: int, default: int):
