@@ -199,7 +199,9 @@ def _build_structural_repr(
             target_seg = (target >> 24) & 0xFF
             if jump_mode == "normalized":
                 if target_seg == current_seg and script_start != 0:
-                    parts.append(f"REL:{target - script_start:08X}")
+                    # DB hashes are generated from C source with placeholder
+                    # jump targets, so they always store REL:00000000
+                    parts.append("REL:00000000")
                 else:
                     parts.append(f"SEG:{target_seg:02X}")
             else:
