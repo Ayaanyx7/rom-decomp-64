@@ -311,6 +311,9 @@ def build_star_position_tweaks():
 
     use_editor = ctx.db.meta.hack_type != "SM64 Rom Manager"
 
+        if ctx.db.meta.hack_type not in ("SM64 Rom Manager", "SM64 Editor"):
+        return []
+            
     tweaks = []
 
     for name, entry in STAR_SCHEMA.items():
@@ -347,6 +350,7 @@ def write_tweaks():
             return int.from_bytes(ctx.rom[addr : addr + length], "big")
 
     def _apply_tweaks_from_dict(tweaks_dict, target_obj):
+        is_rm = ctx.db.meta.hack_type == "SM64 Rom Manager"
         for py_name, tweak in tweaks_dict.items():
             cur = getattr(target_obj, py_name, None)
             if cur is None or getattr(cur, "is_modified", lambda: False)():
@@ -366,17 +370,32 @@ def write_tweaks():
             addr = tweak.get("addr")
             if addr is None:
                 continue
-
             fmt = tweak.get("type")
             length = tweak.get("len")
+
+            # floats are only valid in a Rom Manager layout
+            if fmt == ">f" and not is_rm:
+                continue
+            # int tweaks must sit on a real MIPS immediate
+            if fmt in (">H", ">B") and py_name != "entry_level":
+                kind = "load" if "cap_duration" in py_name else "compare"
+                if not _imm_ok(rom_buf, addr, length, kind):
+                    continue
+
             val = _read_from_rom(addr, fmt, length)
             if val is None:
                 continue
+            if isinstance(val, float) and not math.isfinite(val):
+                continue
+            if fmt in (">H", ">B") and py_name != "entry_level":
+                if val < 1 or val > 20000:
+                    continue
+
             try:
                 setattr(target_obj, py_name, val)
             except Exception:
                 pass
-
+                
     _apply_tweaks_from_dict(ctx.behavior_values.TWEAKS, ctx.behavior_values)
     _apply_tweaks_from_dict(ctx.level_values.TWEAKS, ctx.level_values)
 
