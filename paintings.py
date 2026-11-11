@@ -444,6 +444,7 @@ def notify_painting_draw_discovered(func_rom: int) -> None:
         assert painting_draw_func_rom_addr == func_rom
         return  # Already have the address
     painting_draw_func_rom_addr = func_rom
+    print(f"paintings: geo_painting_draw at ROM 0x{func_rom:X}")   # add this
 
     # Get the rom data
     rom = get_rom()
@@ -454,6 +455,7 @@ def notify_painting_draw_discovered(func_rom: int) -> None:
     # because it's only reference sits inside geo_painting_draw
     # and this method allows for deterministic discovery
     _discover_painting_groups(rom, func_rom)
+    print(f"paintings: sPaintingGroups discovered = {_painting_groups_discovered}")   # add this
     if not _painting_groups_discovered:
         return
 
