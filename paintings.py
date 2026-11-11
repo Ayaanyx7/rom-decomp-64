@@ -162,6 +162,27 @@ def _find_data_address_candidates(rom, func_rom: int) -> Set[int]:
     return candidates
 
 
+def _read_seg_ptr_array(rom, group_rom: int) -> List[int]:
+    addrs: List[int] = []
+    for j in range(0x100):
+        ptr_off = group_rom + j * 4
+        if ptr_off + 4 > len(rom):
+            break
+        seg_ptr = _read_u32(rom, ptr_off)
+        if seg_ptr == 0:
+            break
+        if (seg_ptr >> 24) in range(1, 0x1F) and 0x01000000 <= seg_ptr < 0x20000000:
+            addrs.append(seg_ptr)
+        else:
+            break
+    return addrs
+
+
+# Some hacks place .data a few bytes away from the linear vram->rom mapping, so
+# the group arrays are not exactly where their pointer says. Try small shifts.
+_GROUP_ROM_DELTAS = (0, 0xC, -0xC, 4, -4, 8, -8, 0x10, -0x10, 0x14, -0x14, 0x18, -0x18)
+
+
 def _read_group_arrays(rom, groups_vram: int) -> List[Tuple[int, List[int]]]:
     table_rom = _vram_to_rom(rom, groups_vram)
     if table_rom is None:
@@ -180,16 +201,15 @@ def _read_group_arrays(rom, groups_vram: int) -> List[Tuple[int, List[int]]]:
             continue
 
         addrs: List[int] = []
-        for j in range(0x100):
-            ptr_off = group_rom + j * 4
-            if ptr_off + 4 > len(rom):
-                break
-            seg_ptr = _read_u32(rom, ptr_off)
-            if seg_ptr == 0:
-                break
-            if (seg_ptr >> 24) in range(1, 0x1F) and 0x01000000 <= seg_ptr < 0x20000000:
-                addrs.append(seg_ptr)
-            else:
+        for delta in _GROUP_ROM_DELTAS:
+            if group_rom + delta < 0:
+                continue
+            addrs = _read_seg_ptr_array(rom, group_rom + delta)
+            if addrs:
+                if delta:
+                    debug_print(
+                        f"paintings: group 0x{group_vram:08X} found at ROM delta {delta:+#x}"
+                    )
                 break
         if addrs:
             groups.append((group_vram, addrs))
