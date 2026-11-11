@@ -1,16 +1,5 @@
 import struct
 from dataclasses import dataclass
-from utils import logger as _logger
-
-_orig_debug_print = debug_print
-
-
-def debug_print(msg: str) -> None:  # noqa: F811
-    """Show texture skip/failure messages at WARNING so they are not silent."""
-    if any(k in msg for k in ("Skipping", "skipping", "failed to snapshot", "WARNING")):
-        _logger.warning(msg)
-    else:
-        _orig_debug_print(msg)
 from utils import level_const_name_to_int, level_num_to_const_name
 from typing import Dict, List
 
