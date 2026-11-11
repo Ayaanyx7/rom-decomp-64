@@ -613,7 +613,7 @@ if IS_BROWSER:
 
     def debug_print(msg: str) -> None:
         if _is_important_debug(msg):
-            js.console.warn(msg)
+            print(f"[warn] {msg}")
         else:
             js.console.debug(msg)
 else:
