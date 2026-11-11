@@ -591,15 +591,38 @@ def get_rom() -> Optional[Any]:
     return rom
 
 
+_IMPORTANT_DEBUG_KEYS = (
+    "Skipping",
+    "skipping",
+    "failed",
+    "could not",
+    "WARNING",
+    "paintings:",
+    "MovtexExtractor",
+    "movtex",
+)
+
+
+def _is_important_debug(msg: str) -> bool:
+    """Messages about dropped/failed data should be visible, not debug-only."""
+    return any(k in msg for k in _IMPORTANT_DEBUG_KEYS)
+
+
 if IS_BROWSER:
     import js
 
     def debug_print(msg: str) -> None:
-        js.console.debug(msg)
+        if _is_important_debug(msg):
+            js.console.warn(msg)
+        else:
+            js.console.debug(msg)
 else:
 
     def debug_print(msg: str) -> None:
-        logger.debug(msg)
+        if _is_important_debug(msg):
+            logger.warning(msg)
+        else:
+            logger.debug(msg)
 
 
 def add_provenance(msg: str) -> str:
