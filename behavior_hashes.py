@@ -1580,3 +1580,19 @@ KNOWN_BEHAVIOR_HASHES: Dict[str, Union[str, List[str]]] = {
     "c3794aebd5f71454": "bhvYoshi",
     "a1142f3fa742e8a7": "unused_1",
 }
+
+try:
+    from behavior_hashes_rom import ROM_BEHAVIOR_HASHES as _ROM_HASHES
+
+    for _h, _n in _ROM_HASHES.items():
+        _cur = KNOWN_BEHAVIOR_HASHES.get(_h)
+        if _cur is None:
+            KNOWN_BEHAVIOR_HASHES[_h] = _n
+        else:
+            _names = [_cur] if isinstance(_cur, str) else list(_cur)
+            for _x in [_n] if isinstance(_n, str) else _n:
+                if _x not in _names:
+                    _names.append(_x)
+            KNOWN_BEHAVIOR_HASHES[_h] = _names if len(_names) > 1 else _names[0]
+except ImportError:
+    pass
