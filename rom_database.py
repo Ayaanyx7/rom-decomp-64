@@ -228,6 +228,7 @@ class BehaviorRecord:
     hash: str = ""
     fuzzy_hash: str = ""
     anon_hash: str = ""
+    anon_repr: str = ""
     commands: List[CommandIR] = field(default_factory=list)
     script_text: str = ""  # Deprecated: use commands for serialization
     # Analysis pass fields
