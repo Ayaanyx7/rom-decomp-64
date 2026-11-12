@@ -835,7 +835,12 @@ class MovtexExtractor:
 
             # General search for other hacks
             if not found_ptr:
-                sig_matches = self.find_vertex_signature(vtx_signature)
+                # Quads store corners as (x1,z1)(x1,z2)(x2,z2)(x2,z1) in many hacks,
+                # not (x1,z1)(x2,z1)(x2,z2)(x1,z2). Try both orders.
+                vtx_signature_alt = struct.pack(">8h", x1, z1, x1, z2, x2, z2, x2, z1)
+                sig_matches = self.find_vertex_signature(
+                    vtx_signature
+                ) or self.find_vertex_signature(vtx_signature_alt)
                 for s_seg, s_off in sig_matches:
                     quad_ptr = (s_seg << 24) | s_off
 
