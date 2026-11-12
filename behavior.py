@@ -862,15 +862,19 @@ class BehaviorProcessor(BaseProcessor):
             debug_fail(f"Failed to find database for behavior at 0x{segmented_addr:08x}")
             return None
 
+        anon_repr = _build_structural_repr(
+            commands_data,
+            call_native_mode="anonymous",
+            script_start=segmented_addr,
+            jump_mode="normalized",
+        )
         record = BehaviorRecord(
             seg_addr=segmented_addr,
             beh_name=name,
             hash=prec_hash,
             fuzzy_hash=fuzzy_hash,
             anon_hash=anon_hash,
-            commands=commands_ir,
-            map_symbol=map_sym,
-            map_confidence=map_conf,
+            anon_repr=anon_repr,
         )
         self.ctx.db.behaviors[db_key] = record
         self.ctx.db.set_symbol(segmented_addr, name, "Behavior")
