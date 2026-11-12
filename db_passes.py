@@ -503,6 +503,18 @@ class ObjectCorrelationPass(DatabaseAnalysisPass):
                     best_beh_name = candidate_beh
                     best_model_name = model_name
 
+        if not best_beh_name:
+            near = _near_match_vanilla_behavior(beh_record, model_candidates)
+            if near:
+                best_beh_name, best_score = near
+                best_model_name = next(
+                    (m for m in model_candidates if best_beh_name in MODEL_TO_BEHAVIORS.get(m, set())),
+                    model_candidates[0],
+                )
+                debug_print(
+                    f"  [Near match] {beh_record.beh_name} looks like an edited {best_beh_name}"
+                )
+                
         if best_beh_name and best_model_name:
             debug_print(
                 f"  [Bidirectional ID] {best_model_name} + {best_beh_name} "
