@@ -212,7 +212,47 @@ def _get_vanilla_hashes_for_behavior(beh_name: str) -> Set[str]:
                 _BEH_NAME_TO_HASHES.setdefault(name, set()).add(h)
     return _BEH_NAME_TO_HASHES.get(beh_name, set())
 
+def _near_match_vanilla_behavior(beh_record, model_candidates):
+    """Closest vanilla behavior for hacks that *edited* a vanilla behavior.
 
+    Uses structure from a real vanilla ROM (behavior_hashes_rom.py). Conservative:
+    needs a high, unambiguous score and agreement with the object's model.
+    """
+    repr_ = getattr(beh_record, "anon_repr", "")
+    if not repr_:
+        return None
+    try:
+        from behavior_hashes_rom import ROM_BEHAVIOR_REPRS
+    except ImportError:
+        return None
+    import difflib
+
+    mine = repr_.split("|")
+    allowed: Set[str] = set()
+    for m in model_candidates:
+        allowed |= MODEL_TO_BEHAVIORS.get(m, set())
+
+    scored = []
+    for name, rep in ROM_BEHAVIOR_REPRS.items():
+        r = difflib.SequenceMatcher(None, mine, rep.split("|"), autojunk=False).ratio()
+        if r >= 0.80:
+            scored.append((r, name))
+    if not scored:
+        return None
+    scored.sort(reverse=True)
+    best = scored[0][0]
+    if best < 0.88:
+        return None
+    top = [n for r, n in scored if r == best]
+    if allowed:
+        top = [n for n in top if n in allowed]
+    if len(top) != 1:
+        return None  # nothing agrees with the model, or ambiguous
+    lower = [r for r, n in scored if r < best]
+    if lower and best - lower[0] < 0.05:
+        return None
+    return top[0], 0.60
+    
 # ---------------------------------------------------------------------------
 # Pass 1: Object Correlation
 # ---------------------------------------------------------------------------
